@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<beans xmlns="http://www.springframework.org/schema/beans"  
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+	xmlns:aop="http://www.springframework.org/schema/aop"  
+	xmlns:tx="http://www.springframework.org/schema/tx"  
+	xmlns:context="http://www.springframework.org/schema/context"  
+	xmlns:mvc="http://www.springframework.org/schema/mvc"  
+	xmlns:util="http://www.springframework.org/schema/util"   
+	xmlns:task="http://www.springframework.org/schema/task" 
+	xsi:schemaLocation="  
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd  
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd  
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd  
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd  
+			http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd  
+			http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd 
+			http://www.springframework.org/schema/task   http://www.springframework.org/schema/task/spring-task-4.3.xsd "> 
+
+	<!-- 允许使用注解 -->
+	<context:annotation-config />
+	<mvc:annotation-driven />
+
+	<!-- filter配置 -->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<mvc:exclude-mapping path="/open/**" />
+			<bean class="com.tulip.filters.HandlerLoginFilter">
+			<property name="excludedUrls">
+				<list>
+					<value>health.api</value>
+				</list>
+			</property>
+			</bean>
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+	<!-- spring注解扫描目录 -->
+	<context:component-scan base-package="com.tulip" />
+	
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+		<property name="prefix" value="/WEB-INF/pages/" />
+		<property name="suffix" value=".jsp" /> 
+	</bean>		
+
+	<!-- 处理文件上传，如果请求数据中包含文件，将文件数据解析成 MultipartFile 并封装在 MultipartHttpServletRequest (继承了 HttpServletRequest) 对象中，最后传递给 Controller -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" >
+		<property name="maxUploadSize" value="20971520"/>
+	</bean>
+	<!-- 定义文件上传异常跳转页面 -->
+	<!-- <bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="exceptionMappings"> 
+			<props> 
+				<prop key="org.springframework.web.multipart.MaxUploadSizeExceededException">error_fileupload</prop>
+			</props>
+		</property>
+	</bean> -->
+	
+	<aop:aspectj-autoproxy proxy-target-class="true"/>
+	<!-- 使用spring的事务管理 -->
+	<bean name="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<!-- 申明事务通知 -->  
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="do*" propagation="REQUIRED" rollback-for="Exception"  />
+			<tx:method name="DO*" propagation="REQUIRED" rollback-for="Exception" />
+			<tx:method name="insert*" propagation="REQUIRED" rollback-for="Exception"  />
+			<tx:method name="set*" propagation="REQUIRED" rollback-for="Exception"  />
+			<tx:method name="update*" propagation="REQUIRED" rollback-for="Exception" />
+			<tx:method name="delete*" propagation="REQUIRED" rollback-for="Exception" />
+			<tx:method name="create*" propagation="REQUIRED" rollback-for="Exception" />
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<aop:pointcut expression="execution(public * com.tulip.services..*.*(..))" id="pointcut"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="pointcut"/>
+	</aop:config>
+	
+	<!-- 实现ApplicationContextAware接口，可以在业务中动态回去springbean -->
+	<bean id="spring" class="com.tulip.utils.SpringUtils" />
+	
+	<!-- 定时器开关 -->
+	<!-- <task:annotation-driven /> -->
+	<!-- 定时器任务列表 -->
+	<!-- class添加spring注解 @Component("taskservice")，方法名doTask -->
+	<!-- <task:scheduled-tasks>
+		<task:scheduled ref="taskservice" method="doTask" cron="0 1/3 * * * ?" />
+	</task:scheduled-tasks> -->
+</beans> 
+
