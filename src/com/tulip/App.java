@@ -8,10 +8,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.tulip.utils.CommonUtils;
+import com.tulip.utils.HttpUtils;
 import com.tulip.utils.WeappApiUtils;
-import com.wkblib.utils.CommonUtils;
 import com.wkblib.utils.Crypt;
-import com.wkblib.utils.HttpUtils;
 
 /**
  * Hello world!
