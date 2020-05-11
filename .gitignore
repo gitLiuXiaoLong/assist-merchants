@@ -1,9 +1,6 @@
 build/*
 target/*
 .DS_Store
-.project
-.classpath
-.settings
 .metadata
 .gitignore
 *.log
