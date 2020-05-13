@@ -85,3 +85,31 @@ CREATE TABLE `core_company` (
   `del_flg` char(1) DEFAULT '0' COMMENT '删除FLG',
   PRIMARY KEY (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_general_ci COMMENT='公司表';
+
+DROP TABLE IF EXISTS `core_code_mast`;
+CREATE TABLE `core_code_mast` (
+  `code_group` varchar(40) NOT NULL COMMENT '编码组',
+  `code` varchar(10) NOT NULL COMMENT '编码',
+  `name` varchar(50) DEFAULT NULL COMMENT '编码名称',
+  `detail` varchar(40) DEFAULT NULL COMMENT '详细code_group',
+  `order_by` decimal(5,0) DEFAULT NULL COMMENT '排序',
+  `del_flg` char(2) DEFAULT '0' COMMENT '删除FLG',
+  PRIMARY KEY (`code_group`,`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci COMMENT='系统码表';
+
+DROP TABLE IF EXISTS `core_card`;
+CREATE TABLE `core_card` (
+  `card_id` int(10) NOT NULL AUTO_INCREMENT COMMENT '名片id',
+  `name` varchar(20) NOT NULL COMMENT '姓名',
+  `tel` varchar(11) NOT NULL COMMENT '电话',
+  `mail` varchar(80) DEFAULT NULL COMMENT '邮箱',
+  `intro` varchar(400) DEFAULT NULL COMMENT '介绍',
+  `image` varchar(255) DEFAULT NULL COMMENT '头像',
+  `company` int(10) DEFAULT NULL COMMENT '公司',
+  `department` int(10) DEFAULT NULL COMMENT '部门',
+  `position` varchar(10) DEFAULT NULL COMMENT '职位',
+  `openid` varchar(30) DEFAULT NULL COMMENT '小程序openid',
+  `qrcode` varchar(100) DEFAULT NULL COMMENT '个人名片码',
+  PRIMARY KEY (`card_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_general_ci COMMENT='名片表';
+create index idx_core_card_openid on core_card(openid);
